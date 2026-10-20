@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.log
+.env
+connections.json
+secrets.json
+.env.*
+!.env.example
+release/
+reports/
+__pycache__/
+*.pyc
+*.tgz
+*.zip

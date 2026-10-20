@@ -1,0 +1,32 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "data-mcp",
+  "version": "0.1.0-alpha.1",
+  "description": "Local MySQL, Redis and MongoDB MCP tools. Read-only by default; explicit non-production writes; production always read-only.",
+  "author": {
+    "name": "ResetFull",
+    "url": "https://github.com/ResetFull"
+  },
+  "license": "Apache-2.0",
+  "repository": "https://github.com/ResetFull/ai-data-mcp",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Data MCP",
+        "shortDescription": "MySQL、Redis 与 MongoDB 安全访问",
+        "longDescription": "本地数据库 MCP：MySQL、Redis、MongoDB，默认只读，非生产写入须显式启用，生产始终只读。",
+        "developerName": "ResetFull",
+        "category": "Developer Tools",
+        "capabilities": [
+          "Interactive",
+          "Write"
+        ],
+        "defaultPrompt": [
+          "列出已配置的数据连接并说明有效访问模式。",
+          "检查表结构与索引，再执行有界只读查询。",
+          "在显式启用写入的测试连接中修改数据并读回验证。"
+        ]
+      }
+    }
+  }
+}

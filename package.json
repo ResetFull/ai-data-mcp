@@ -1,0 +1,80 @@
+{
+  "name": "data-mcp-server",
+  "version": "0.1.0-alpha.1",
+  "description": "Local MySQL, Redis, and MongoDB MCP server with production read-only enforcement",
+  "type": "module",
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "clean": "node --eval \"import('node:fs').then(({rmSync}) => rmSync('dist', { recursive: true, force: true }))\"",
+    "build": "npm run clean && tsc -p tsconfig.json",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "start:http": "node dist/index.js --transport=http",
+    "service:install": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-service.ps1",
+    "service:start": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-service.ps1",
+    "service:status": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/status-service.ps1",
+    "service:stop": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/stop-service.ps1",
+    "smoke": "node scripts/verify-stdio.mjs",
+    "smoke:http": "vitest run test/http-server.test.ts",
+    "test": "vitest run",
+    "check": "npm run build && npm test",
+    "config:init": "node scripts/config.mjs init",
+    "config:validate": "node scripts/config.mjs validate",
+    "demo": "node scripts/verify-stdio.mjs --demo",
+    "smoke:configured": "node scripts/verify-stdio.mjs --configured",
+    "test:integration": "node scripts/integration.mjs",
+    "privacy": "python -B scripts/privacy_check.py",
+    "package:release": "python -B scripts/package_release.py",
+    "prepack": "npm run build",
+    "service:uninstall": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/uninstall-service.ps1"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/node": "2.0.0",
+    "@modelcontextprotocol/server": "^2.0.0",
+    "mongodb": "^5.9.2",
+    "mysql2": "^3.23.3",
+    "node-sql-parser": "^5.4.0",
+    "redis": "^6.2.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  },
+  "license": "Apache-2.0",
+  "author": "ResetFull",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ResetFull/ai-data-mcp.git"
+  },
+  "homepage": "https://github.com/ResetFull/ai-data-mcp",
+  "bugs": {
+    "url": "https://github.com/ResetFull/ai-data-mcp/issues"
+  },
+  "bin": {
+    "data-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist/",
+    "scripts/",
+    "config/*.example.json",
+    "docs/",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE",
+    "NOTICE",
+    "SECURITY.md",
+    "CONTRIBUTING.md",
+    "CHANGELOG.md",
+    "plugin.json",
+    "mcp.json",
+    ".mcp.json",
+    ".codex-plugin/",
+    ".agents/"
+  ]
+}

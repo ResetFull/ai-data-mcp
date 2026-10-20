@@ -1,0 +1,54 @@
+{
+  "mysql": {
+    "connections": [
+      {
+        "id": "prod-main",
+        "environment": "prod",
+        "host": "prod-mysql.example.internal",
+        "port": 3306,
+        "database": "business_db",
+        "user": "codex_prod_ro",
+        "ssl": true,
+        "connectTimeoutMs": 10000,
+        "write_enabled": false
+      },
+      {
+        "id": "test-main",
+        "environment": "test",
+        "host": "test-mysql.example.internal",
+        "port": 3306,
+        "database": "business_db",
+        "user": "codex_test_rw",
+        "ssl": false,
+        "connectTimeoutMs": 10000,
+        "write_enabled": false
+      }
+    ]
+  },
+  "redis": {
+    "connections": [
+      {
+        "id": "cache-test",
+        "environment": "test",
+        "host": "redis.example.internal",
+        "port": 6379,
+        "database": 0,
+        "tls": false,
+        "connectTimeoutMs": 10000,
+        "write_enabled": false
+      }
+    ]
+  },
+  "mongo": {
+    "connections": [
+      {
+        "id": "document-test",
+        "environment": "test",
+        "database": "documents",
+        "maxPoolSize": 5,
+        "connectTimeoutMs": 10000,
+        "write_enabled": false
+      }
+    ]
+  }
+}

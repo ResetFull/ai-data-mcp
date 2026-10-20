@@ -1,0 +1,6 @@
+AI Data MCP
+Copyright 2026 ResetFull and contributors
+
+Licensed under the Apache License, Version 2.0.
+Runtime and development dependencies are installed separately through npm and
+remain subject to their own licenses. See docs/third-party.md and package-lock.json.

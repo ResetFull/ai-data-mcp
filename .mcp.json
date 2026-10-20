@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "data-mcp": {
+      "url": "http://127.0.0.1:17890/mcp",
+      "bearer_token_env_var": "DATA_MCP_HTTP_TOKEN",
+      "tool_timeout_sec": 130
+    }
+  }
+}

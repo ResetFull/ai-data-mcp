@@ -1,0 +1,10 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "data-mcp": {
+      "type": "streamable-http",
+      "url": "http://127.0.0.1:17890/mcp",
+      "bearer_token_env_var": "DATA_MCP_HTTP_TOKEN"
+    }
+  }
+}

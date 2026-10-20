@@ -1,0 +1,105 @@
+name: Checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: ['22', '24']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+      - run: npm ci --ignore-scripts
+      - run: npm run check
+      - run: npm run smoke
+      - run: npm audit
+      - run: python -B scripts/privacy_check.py
+      - run: python -B scripts/publication_checks.py
+      - name: Parse Windows service scripts
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Get-ChildItem scripts/*.ps1 | ForEach-Object {
+            $parseTokens = $null
+            $parseErrors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$parseTokens, [ref]$parseErrors) | Out-Null
+            if ($parseErrors.Count -gt 0) { throw "PowerShell parse failed: $($_.Name)" }
+          }
+
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: synthetic-integration-password
+          MYSQL_ROOT_HOST: '%'
+          MYSQL_DATABASE: demo
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -psynthetic-integration-password"
+          --health-interval=10s --health-timeout=5s --health-retries=12
+      redis:
+        image: redis:7.4
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=5s --health-timeout=5s --health-retries=12
+      mongo:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd="mongosh --quiet --eval 'db.adminCommand({ping:1})'"
+          --health-interval=5s --health-timeout=5s --health-retries=12
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+      - run: npm run test:integration
+        env:
+          DATA_MCP_INTEGRATION: '1'
+
+  package:
+    needs: [checks, integration]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+      - run: npm ci --ignore-scripts
+      - run: python -B scripts/package_release.py
+      - name: Verify deterministic packaging
+        run: |
+          cp release/SHA256SUMS /tmp/data-mcp-first-sums
+          python -B scripts/package_release.py
+          cmp /tmp/data-mcp-first-sums release/SHA256SUMS
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: alpha-package
+          path: release/*
+          retention-days: 14
